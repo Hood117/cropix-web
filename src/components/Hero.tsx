@@ -11,15 +11,6 @@ export function Hero() {
       <div className="pointer-events-none absolute inset-0" aria-hidden>
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_18%,rgb(45_212_191_/_0.16),transparent_68%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_50%_40%_at_15%_85%,rgb(45_212_191_/_0.07),transparent)]" />
-        <div
-          className="absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage:
-              "linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)",
-            backgroundSize: "56px 56px",
-            maskImage: "radial-gradient(ellipse 65% 55% at 50% 42%, black, transparent)",
-          }}
-        />
       </div>
 
       <div className="relative mx-auto flex w-full min-w-0 max-w-3xl flex-col items-center px-5 pb-20 pt-20 text-center sm:px-8 sm:pb-28 sm:pt-28">
