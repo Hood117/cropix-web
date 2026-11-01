@@ -1,25 +1,43 @@
 import { useEffect, useState } from "react";
-import { latestReleaseApi, site } from "./config";
+import { downloadUrl, latestReleaseApi, site } from "./config";
 
-let pending: Promise<string | null> | null = null;
+type LatestRelease = {
+  version: string | null;
+  installerUrl: string | null;
+};
 
-function loadLatestVersion(): Promise<string | null> {
+let pending: Promise<LatestRelease> | null = null;
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function installerFromRelease(data: Record<string, unknown>): string | null {
+  if (!Array.isArray(data.assets)) return null;
+  const exe = data.assets.find((asset) => {
+    if (!isRecord(asset) || typeof asset.name !== "string") return false;
+    return asset.name.toLowerCase().endsWith(".exe");
+  });
+  if (!isRecord(exe) || typeof exe.browser_download_url !== "string") return null;
+  return exe.browser_download_url;
+}
+
+function loadLatestRelease(): Promise<LatestRelease> {
   if (!pending) {
     pending = fetch(latestReleaseApi)
       .then((response) => (response.ok ? response.json() : null))
       .then((data: unknown) => {
-        if (
-          !data ||
-          typeof data !== "object" ||
-          !("tag_name" in data) ||
-          typeof data.tag_name !== "string"
-        ) {
-          return null;
-        }
-        const tag = data.tag_name.replace(/^v/i, "").trim();
-        return tag.length > 0 ? tag : null;
+        if (!isRecord(data)) return { version: null, installerUrl: null };
+        const version =
+          typeof data.tag_name === "string"
+            ? data.tag_name.replace(/^v/i, "").trim()
+            : "";
+        return {
+          version: version.length > 0 ? version : null,
+          installerUrl: installerFromRelease(data),
+        };
       })
-      .catch(() => null);
+      .catch(() => ({ version: null, installerUrl: null }));
   }
   return pending;
 }
@@ -29,10 +47,8 @@ export function useReleaseVersion(): string {
 
   useEffect(() => {
     let active = true;
-    loadLatestVersion().then((tag) => {
-      if (active && tag) {
-        setVersion(tag);
-      }
+    loadLatestRelease().then((release) => {
+      if (active && release.version) setVersion(release.version);
     });
     return () => {
       active = false;
@@ -40,4 +56,20 @@ export function useReleaseVersion(): string {
   }, []);
 
   return version;
+}
+
+export function useInstallerUrl(): string {
+  const [installerUrl, setInstallerUrl] = useState(downloadUrl);
+
+  useEffect(() => {
+    let active = true;
+    loadLatestRelease().then((release) => {
+      if (active && release.installerUrl) setInstallerUrl(release.installerUrl);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  return installerUrl;
 }

@@ -1,12 +1,14 @@
-import { downloadUrl } from "../config";
+import { useInstallerUrl } from "../useReleaseVersion";
 
 type DownloadLinkProps = {
   className?: string;
 };
 
 export function DownloadLink({ className }: DownloadLinkProps) {
+  const installerUrl = useInstallerUrl();
+
   return (
-    <a href={downloadUrl} className={className}>
+    <a href={installerUrl} className={className}>
       <WindowsMark />
       <span className="min-w-0 text-balance">Download for Windows</span>
     </a>

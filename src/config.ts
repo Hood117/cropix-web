@@ -3,7 +3,7 @@ export const site = {
   version: "0.1.0",
   githubOwner: "Hood117",
   githubRepo: "cropix-web",
-  assetName: "Cropix-Setup-x64.exe",
+  assetName: "Cropix_0.1.0_x64-setup.exe",
 } as const;
 
 export const downloadUrl = `https://github.com/${site.githubOwner}/${site.githubRepo}/releases/latest/download/${site.assetName}`;
